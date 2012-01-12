@@ -167,15 +167,15 @@ for the detail.) It is declared in erasm::x64 and erasm::x86 namespaces.
 
 The operational meaning of each instruction is always the same.That is,
 it encodes the instruction at the location specified by the first argument(p),
-and returns the number of bytes encoded.It is guaranteed that either it 
-succeeds to encode the instruction if it is syntactically valid and the
-target address is writable,or the compilation fails.It is undefined what
-would happen if the destination address is not writable.In particular,it
-never throws a (C++) exception.
+and returns the number of bytes encoded.If the target address is writable,it
+is guaranteed that either it succeeds to encode the instruction, or the 
+instruction is syntactically ill-formed and the compilation fails.It is
+undefined what would happen if the destination address is not writable.In
+particular,it never throws a (C++) exception.
 
 MNEMONIC is generally one of the lower-case instruction mnemonics as defined
 in the Intel's Instruction Set Reference[2]. There are some exceptions,
-hough.One is that if the lower-case mnemonic is reserved as a keyword in 
+though.One is that if the lower-case mnemonic is reserved as a keyword in 
 C++.In such a case,we append an underscore to the mnemonic, as in 'int_'. 
 Additionally,some instructions are ambiguous and cannot be fully specified
 solely by the combination of mnemonic and operand types. In such a case, 
