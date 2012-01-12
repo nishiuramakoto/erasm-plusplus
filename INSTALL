@@ -1,0 +1,61 @@
+---------------------------------
+ERASM++ Installation Instructions
+---------------------------------
+ * Supported Platforms
+ * Requirements
+ * Installation
+
+SUPPORTED PLATFORMS
+------------------
+
+We have tested the library on following systems and compilers:
+
+Debian Testing(squeeze) running on Intel Celeron M 1.3GHz,
+g++ version 4.6.1 and 4.5.3.
+
+Windows 7 32-bit running on Intel Pentium Dual Core 2.4GHz,
+mingw g++ version 4.6.1 and 4.5.4.
+
+cl.exe bundled with Visual C++ 2011 Express looks fine,but not tested 
+thoroughly yet.
+
+Please report if you have succeeded or failed to build and use ERASM++ on
+other systems.
+
+
+REQUIREMENTS
+------------
+
+ERASM++ requires:
+
+* GNU Autotools
+* Boost static_assert
+* Boost stdint 
+ (ERASM++ assumes the availability of 8-,16-,32-,and 64-bit integers)
+* Boost preprocessor
+
+Check out http://www.boost.org and install above libraries.
+
+Furthermore,the following additional requirements must be met in order to
+pass 'make check':
+
+* GoogleTest
+* GHC >= 7.0.3
+* parsec,uulib,HUnit,QuickCheck >=2.4,HaskellForMaths >=0.4.0,fgl 
+  all of which are available through 'cabal install'.
+
+(In order to ensure maximum cross-compiler portability,should we switch to
+other build systems? like cmake? boost's?)
+
+
+INSTALLATION
+------------
+./configure --prefix=your-private-directory
+make
+make install
+
+This will install the necessary headers under PREFIX/include/erasm,
+and libraries under PREFIX/lib/erasm.
+
+We don't recommend installing on the system directories,as ERASM++ is still
+in its alpha stage.

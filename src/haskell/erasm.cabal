@@ -1,0 +1,138 @@
+--    Copyright (C) 2011,2012 Makoto Nishiura.
+
+--    This file is part of ERASM++.
+
+--    ERASM++ is free software; you can redistribute it and/or modify it under
+--    the terms of the GNU General Public License as published by the Free
+--    Software Foundation; either version 3, or (at your option) any later
+--    version.
+
+--    ERASM++ is distributed in the hope that it will be useful, but WITHOUT ANY
+--    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+--    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+--    for more details.
+
+--    You should have received a copy of the GNU General Public License
+--    along with ERASM++; see the file COPYING.  If not see
+--    <http://www.gnu.org/licenses/>.  
+
+name: InstructionManualParser
+version: 0.1
+cabal-version: >= 1.8
+build-type: Simple
+
+
+Flag Debug
+     Description:Enable debug support
+     Default: True
+
+Flag Preprocess
+     Default:True
+
+Flag AsmGen
+     Default:False
+
+Flag Checker
+     Default:False
+
+Flag MetaHaskell
+     Default:False
+
+
+
+--Library
+-- Build-Depends: base,regex-posix,array,HUnit,QuickCheck,split
+-- Exposed-Modules: InstructionManualParser,InstructionManualLexer,InstructionDefinition
+
+Executable preprocess
+ build-depends: base,process,directory,cmdargs,HSH,regex-tdfa , temporary
+ Main-Is: Preprocessor.hs
+ Other-Modules: ShellCommon
+ if flag(Preprocess)
+  buildable:True
+ else
+  buildable:False
+
+
+Executable meta_haskell
+ build-depends:base,containers,uulib,HUnit,QuickCheck
+ Main-Is:MetaHaskell.hs
+ if flag(MetaHaskell)
+  buildable:True
+ else
+  buildable:False
+
+-- Executable myghcpp
+--  build-depends: base,process,directory
+--  Main-Is: MyGhcpp.hs
+--  Other-Modules: MyProcess
+
+
+
+
+-- TODO: Get rid of regex-posix ( too buggy,works only for *nix systems)
+Executable instruction_manual_parser
+ Build-Depends: base,regex-tdfa,array,HUnit,QuickCheck >= 2.4,split,text,containers,
+                parsec,uulib,random,fgl,process , HList ,ghc-prim , syb == 0.3
+ Main-Is:         ErasmMain.hs
+ Other-Modules:   InstructionManualParser
+                  , InstructionManualLexer
+                  , InstructionDefinition
+                  , Operands
+                  , EncodedInstructionDefinition
+                  , EncodedInstructionDefinitionErrata
+                  , AssemblerGen
+                  , AssemblerFunction
+                  , AssemblerInterface
+                  , ParamType
+                  , GenTestCommon
+                  , GenTest64
+                  , DisassemblerGen
+                  , OpcodeTrie64
+                  , OpcodeTrie86
+                  , Trie
+                  , Pretty
+                  , Prefix
+                  , Equivalence
+                  , PartialOrder
+                  , Combinators
+                  , ErasmCommon
+                  , ErasmMain
+                  , ErasmIO
+                  , CPlusPlusSemantics
+                  , CPlusPlusSemanticsDef , CPlusPlusSemanticsPretty 
+                  , LaxCPlusPlusGrammar 
+                  , CPlusPlusLexical
+                  , CPlusPlusPretty
+                  , GrammarCommon
+ if flag(AsmGen)
+  buildable:True
+ else
+  buildable:False
+
+ if flag(debug)
+    GHC-Options: -Wall
+ else
+    GHC-Options: -Wall
+
+Executable erasm_checker
+ Build-Depends: base,parsec,containers,uulib,HUnit,QuickCheck >=2.4,HaskellForMaths >= 0.4.0,fgl
+ Main-Is:       ErasmChecker.hs
+ Other-Modules: ErasmCommon,
+                ErasmParseCommon,
+                Equivalence,
+                EncodedInstructionDefinition,
+                Operands,
+                PartialOrder,
+                Polynomial,
+                Prefix,
+                Combinators                    
+ if flag(Checker)
+  buildable:True
+ else
+  buildable:False
+
+
+-- Executable testExample
+--  Build-Depends: base,regex-posix,array,HUnit
+--  Main-Is:      MyTestExample.hs

@@ -1,0 +1,2 @@
+dword_ptr[disp32] should not be allowed in x64 mode;
+dword_ptr[rip + disp32] should
