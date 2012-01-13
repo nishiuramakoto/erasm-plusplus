@@ -1,45 +1,24 @@
 Copyright 2010,2011,2012 Makoto Nishiura.
 
-This directory tree holds version 0.1 of ERASM++, Embedded Run-time ASseMbler
-in C++, a library for runtime code generation,inspection,and meta-programming.
+This is version 0.1 of ERASM++, Embedded Run-time ASseMbler in C++, 
+a library for runtime code generation.
 
 See INSTALL for system requirements and installation instructions.
 For the moment,this README is intended to serve as the only documentation
 of the library.
 
 Contents
-1. Introduction
-2. ERASM++
- 2.1 Overview
- 2.2 Basic Usage
- 2.3 Syntax
- 2.4 Performance
- 2.5 Applications
- 2.6 Limitations
-3. Generic Instruction Decoder
- 3.1 Overview
- 3.2 Basic Usage
- 3.3 Performance
-4. MetaPrelude
- 4.1 Overview
-5. License 
+1. ERASM++
+ 1.1 Overview
+ 1.2 Basic Usage
+ 1.3 Syntax
+ 1.4 Performance
+ 1.5 Limitations
+2. License 
 
-1. Intruduction
+1. ERASM++
 
-This is a collection of libraries for run-time code inspection and code 
-generation. They were conceived as the first non-trivial Embedded Domain 
-Specific Language (EDSL) application of my lazy meta-programming library,
-MetaPrelude, which is also included in this distribution. The emphasis has
-been on ease-of-use, type-safety,genericity,flexibility,and (run-time) 
-performance at the sacrifice of increased compile-time resource usage. If
-you ever find these tools useful (or not) for your own project or your work,
-I would really like to know that. Thanks!
-
-Makoto Nishiura (nishiuramakoto@gmail.com)
-
-2. ERASM++
-
-2.1 Overview
+1.1 Overview
 
 ERASM++ is an Embedded Domain Specific Language(EDSL) in C++ for run-time
 code generation.Its main strengths are very close syntactical similarity
@@ -48,7 +27,7 @@ ability to produce very high quality code, and near full standard conformance
 (see below for exceptions). Current support includes Intel x86/x86-64
 architecture only.
 
-2.2 Basic Usage
+1.2 Basic Usage
 
 32-bit case
 
@@ -142,7 +121,7 @@ and 32-bit. Currently we don't support other default address or operand size
 
 TODO:Add instructions for other compilers
 
-2.3 Syntax
+1.3 Syntax
 
 In general, the prototype of an instruction is in one of the following forms:
 
@@ -151,8 +130,9 @@ int MNEMONIC(uint8_t* p,OPERAND_TYPE op1);
 int MNEMONIC(uint8_t* p,OPERAND_TYPE op1,OPERAND_TYPE op2);
 int MNEMONIC(uint8_t* p,OPERAND_TYPE op1,OPERAND_TYPE op2,OPERAND_TYPE op3);
 
-where uint8_t is most likely an alias of unsigned char.(see Boost's stdint 
-for the detail.) It is declared in erasm::x64 and erasm::x86 namespaces.
+where uint8_t is most likely an alias of unsigned char.(see the documentation
+of Boost stdint for the detail.) It is declared in erasm::x64 and
+erasm::x86 namespaces.
 
 Examples:
  p += adc  (p,word_ptr  [edx + esi * _2],ax);
@@ -204,9 +184,10 @@ of the following objects:
      xmmword_ptr . gs[bx+di].
 
  * Immediates. (int32_t)0,(int8_t)1,_1,_2,etc. The static constants _0 - _9
-   can be used as a shorthand for specifying 8-bit integers. By nature,
-   assembly instructions are quite picky about the exact operand types, so
-   often explicit casting is necessary to avoid ambiguity.
+   can be used as a shorthand for specifying small 8-bit integers. By nature,
+   assembly instructions are quite picky about the exact operand types, and
+   it is very often the case that explicit casting is necessary to avoid
+   ambiguity.
 
 A caveat is that the scale coefficient of the index register 
 (e.g. _2 of [edx + _2 * ecx]) must be specified with the static constants
@@ -228,21 +209,21 @@ For the examples of ill-formed instructions,see
   src/erasm/x86_assembler_illegal_code.cpp.
 
 
-2.4 Performance
+1.4 Performance
 
-There are strong arguments against introducing C++ code into the operating
-system kernel spaces[5][6].Our view is that, with the emphasis of generic or
-static type-level computing and careful avoidance of built-in dynamic
-mechanisms, it is sometimes possible to produce very high-quality code that
-can be an order of magnitude faster than the corresponding C code while at
-the same time much more user-friendly and perfectly safe to use in the kernel
-space.
+If all the required functions are inlined(see below),ERASM++ instructions 
+will be compiled to a very fast and very localized code.
 
 Let us give an example.
 
 g++ 4.6.1 compiles (with the option -O3) the following code
 
 <CODE>
+inline int adc (code_ptr p, const ByteReg86 & op1,const BytePtr86 & op2)
+{
+   // if the required instruction definition is declared inline like this..
+}
+
 extern "C" int code_test(code_ptr p)
 { return adc(p ,cl,byte_ptr [eax+ebp*_4+12345678]);  }
 </CODE>
@@ -266,11 +247,10 @@ _code_test:
 	add	esp, 32
 	ret
 </CODE>
-provided all of the required functions are inlined(see below).
 
-Although the above code is not the fastest possible(for example,it uses
-a partial reference of edx,non-aligned mov,etc.), it possesses the following
-very nice properties:
+
+Although the above code may not be the fastest possible, we observe the
+following very nice properties:
 
 * No branches. 
 
@@ -285,36 +265,16 @@ and the code runs in a high priority mode.)
 This is also a very good property for the similar reasons. See [4] for the
 details.
 
+Although there are strong arguments against introducing C++ into the 
+operating system kernel spaces[5][6], it should be clear that ERASM++ per se
+does not possess any such weakness that makes it hard to adopt C++ code into
+the kernel space.
+
 Currently the main ERASM++ encoder functions are all compiled in a seperate
 module for the sake of compile-time performance.See 
 src/test_asm_performance.cpp for how to inline the required functions.
 
-
-(To be fair,code written in C could achieve the same performance level by
-heavy inlining and/or link-time optimizations as the equivalent C++ code with
-static type level computing.But not always --- there is an essential 
-difference when partiality is involved. In trying to optimize away a
-redundant partial function, the compiler would have to prove that the
-function is well-defined(e.g. it doesn't crash,call abort(),etc.) on the set
-of possible inputs to the function,which is an undecidable problem in general.
-In contrast, a static type-level program is itself a proof that the 
-input-output relation can be determined statically,and does not have a side
-effect.)
-
-2.5 Applications
-
-We have implemented a prototypical thread-safe function hook library that
-can hook __pascal(WINAPI),__ccall and its variants(C++ methods,Windows COM
-methods). It can hook,for example,functions in kernel32.dll,ntdll.dll,or
-DirectShow methods.
-
-Another interesting application would be to translate a compiled assembly
-source file to equivalent ERASM++ code, and to have the whole or part of the
-application be generated at run-time.This could be used to increase the cost
-of reverse-engineering the IP-sensitive parts of the program.(However,we have
-not implemented labels and back-patching schemes yet.)
-
-2.6 Limitations
+1.5 Limitations
 
 By far the biggest limitation of ERASM++ is its compile-time resource usage.
 For reasons explained later,the exact compile-time behaviour greatly varies
@@ -367,25 +327,7 @@ implementation does support the platform, there should be no problem
 compiling ERASM++ as long as the compiler is reasonably standard-conformant.
 
 
-3. Generic Instruction Decoder
-
-3.1 Overview
-To be written.
-
-3.2 Basic Usage
-To be written.
-See erasm_dsm_x86_performance_test.cpp for the basic usage.
-
-3.3 Performance
-To be written.
-Please run 'make time_dsm86' to see if it's really worth the trouble.
-
-4. MetaPrelude
-
-4.1 Overview
-To be written.
-
-5. License
+2. License
 
 ERASM++ is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
