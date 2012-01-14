@@ -59,8 +59,8 @@ other build systems? like cmake? boost's?)
 
 INSTALLATION
 ------------
-git clone git://github.com/nishiuramakoto/ERASM-plusplus.git
-cd ERASM-plusplus
+git clone git://github.com/nishiuramakoto/erasm-plusplus.git
+cd erasm-plusplus
 ./configure --prefix=your-private-directory
 make
 make install
