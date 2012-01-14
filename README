@@ -265,7 +265,7 @@ and the code runs in a high priority mode.)
 This is also a very good property for the similar reasons. See [4] for the
 details.
 
-Although there are strong arguments against introducing C++ into the 
+Although there are strong arguments against introducing C++ code into the 
 operating system kernel spaces[5][6], it should be clear that ERASM++ per se
 does not possess any such weakness that makes it hard to adopt C++ code into
 the kernel space.

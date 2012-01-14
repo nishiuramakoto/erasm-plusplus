@@ -11,10 +11,13 @@ SUPPORTED PLATFORMS
 We have tested the library on following systems and compilers:
 
 Debian Testing(squeeze) running on Intel Celeron M 1.3GHz,
-g++ version 4.6.1 and 4.5.3.
+g++ version 4.5.3.
 
 Windows 7 32-bit running on Intel Pentium Dual Core 2.4GHz,
-mingw g++ version 4.6.1 and 4.5.4.
+mingw g++ version 4.5.4.
+
+On 32-bit systems,g++ 4.6.1 won't pass 'make check'. See README for the
+detail.
 
 cl.exe bundled with Visual C++ 2011 Express looks fine,but not tested 
 thoroughly yet.
@@ -29,12 +32,15 @@ REQUIREMENTS
 ERASM++ requires:
 
 * GNU Autotools
-* Boost static_assert
+* Boost static assert
 * Boost stdint 
  (ERASM++ assumes the availability of 8-,16-,32-,and 64-bit integers)
 * Boost preprocessor
 
 Check out http://www.boost.org and install above libraries.
+
+Additionally, we use "#pragma pack" for struct packing.If your compiler
+doesn't support this,please let us know.
 
 Furthermore,the following additional requirements must be met in order to
 pass 'make check':
