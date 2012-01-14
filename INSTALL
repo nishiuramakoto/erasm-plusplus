@@ -32,7 +32,7 @@ REQUIREMENTS
 
 ERASM++ requires:
 
-* GNU Autotools
+* GNU make
 * Boost static assert
 * Boost stdint 
  (ERASM++ assumes the availability of int8_t,int16_t,int32_t,int64_t and
@@ -42,19 +42,17 @@ ERASM++ requires:
 Check out http://www.boost.org and install above libraries.
 
 Additionally, we use "#pragma pack" for struct packing.If your compiler
-doesn't support this,please let us know.
+doesn't support this,please let me know.
 
 Furthermore,the following additional requirements must be met in order to
 pass 'make check':
 
 * GoogleTest
-* libopcodes (bundled with binutils)
-* GHC >= 7.0.3
+* libopcodes (bundled with GNU binutils)
+* GHC (Glasgow Haskell Compiler) >= 7.0.3
+* cabal
 * parsec,uulib,HUnit,QuickCheck >=2.4,HaskellForMaths >=0.4.0,fgl 
   all of which are available through 'cabal install'.
-
-(In order to ensure maximum cross-compiler portability,should we switch to
-other build systems? like cmake? boost's?)
 
 
 INSTALLATION
@@ -66,7 +64,7 @@ make
 make install
 
 This will install the necessary headers under PREFIX/include/erasm,
-and libraries under PREFIX/lib/erasm.
+and libraries under PREFIX/lib.
 
 We don't recommend installing on the system directories,as ERASM++ is still
 in its alpha stage.

@@ -69,7 +69,7 @@ check_PROGRAMS 	= \
 	erasm_checker \
 	preprocess
 
-pkglib_LTLIBRARIES 	= liberasm64.la liberasm86.la
+lib_LTLIBRARIES 	= liberasm64.la liberasm86.la
 check_LTLIBRARIES 	= liberasm64_test.la liberasm86_test.la libgnu_dsm.la
 
 ERASM64_TEST_LDADD = liberasm64_test.la liberasm64.la 
@@ -87,7 +87,7 @@ EXTRA_PROGRAMS	= \
 	myghcpp meta_haskell \
 	test_gnudsm hook_test
 
-pkginclude_HEADERS 	= \
+nobase_include_HEADERS 	= \
 	erasm/dsm_x64.hpp  \
 	erasm/dsm_x64_auto_stm.hpp \
 	erasm/dsm_x86.hpp \

@@ -3,3 +3,4 @@ gas assembler source <-> rasm c code
 cl (masm) source <-> rasm c code
 integrate with Visual Studio
 
+Debug build vesion that compiles reasonably fast
