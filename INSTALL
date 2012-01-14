@@ -16,8 +16,9 @@ g++ version 4.5.3.
 Windows 7 32-bit running on Intel Pentium Dual Core 2.4GHz,
 mingw g++ version 4.5.4.
 
-On 32-bit systems,g++ 4.6.1 won't pass 'make check'. See README for the
-detail.
+Unfortunately,g++ 4.6.1 won't pass 'make check'. (it will eat up all the
+user space. See README for the details.) However, there should be no problem
+just to compile and install the library.
 
 cl.exe bundled with Visual C++ 2011 Express looks fine,but not tested 
 thoroughly yet.
@@ -34,7 +35,8 @@ ERASM++ requires:
 * GNU Autotools
 * Boost static assert
 * Boost stdint 
- (ERASM++ assumes the availability of 8-,16-,32-,and 64-bit integers)
+ (ERASM++ assumes the availability of int8_t,int16_t,int32_t,int64_t and
+  their unsigned counterparts)
 * Boost preprocessor
 
 Check out http://www.boost.org and install above libraries.
@@ -46,6 +48,7 @@ Furthermore,the following additional requirements must be met in order to
 pass 'make check':
 
 * GoogleTest
+* libopcodes (bundled with binutils)
 * GHC >= 7.0.3
 * parsec,uulib,HUnit,QuickCheck >=2.4,HaskellForMaths >=0.4.0,fgl 
   all of which are available through 'cabal install'.
@@ -56,6 +59,8 @@ other build systems? like cmake? boost's?)
 
 INSTALLATION
 ------------
+git clone git://github.com/nishiuramakoto/ERASM-plusplus.git
+cd ERASM-plusplus
 ./configure --prefix=your-private-directory
 make
 make install
@@ -65,3 +70,4 @@ and libraries under PREFIX/lib/erasm.
 
 We don't recommend installing on the system directories,as ERASM++ is still
 in its alpha stage.
+

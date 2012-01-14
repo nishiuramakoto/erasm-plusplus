@@ -70,7 +70,10 @@ check_PROGRAMS 	= \
 	preprocess
 
 pkglib_LTLIBRARIES 	= liberasm64.la liberasm86.la
-check_LTLIBRARIES 	= libgnu_dsm.la
+check_LTLIBRARIES 	= liberasm64_test.la liberasm86_test.la libgnu_dsm.la
+
+ERASM64_TEST_LDADD = liberasm64.la liberasm64_test.la
+ERASM86_TEST_LDADD = liberasm86.la liberasm86_test.la
 
 EXTRA_PROGRAMS	= \
 	erasm_dsm_x86_prof \
@@ -163,20 +166,25 @@ BUILT_SOURCES		= $(ERASM_GENERATED_FILES)
 
 liberasm64_la_SOURCES 	= erasm/x64.cpp erasm/x64_assembler_impl.cpp \
 			  erasm/x64_addr64_data32.cpp \
-			  erasm/x64_assembler_test_code_64_32.cpp \
 			  erasm/x64_instruction_definition.cpp
 
-liberasm64_la_DEPENDENCIES = erasm/x64_assembler_test_code_64_32.hpp \
-			    erasm/x64_assembler_manual_test.cpp 
 
 liberasm86_la_SOURCES	= erasm/x64.cpp erasm/x64_assembler_impl.cpp \
 			  erasm/x86.cpp erasm/x86_assembler_impl.cpp \
 			  erasm/x86_addr32_data32.cpp \
-			  erasm/x86_assembler_test_code_32_32.cpp \
 			  erasm/x86_instruction_definition.cpp
 
-liberasm86_la_DEPENDENCIES = erasm/x86_assembler_test_code_32_32.hpp \
-			    erasm/x86_assembler_manual_test.cpp
+
+
+liberasm64_test_la_SOURCES= erasm/x64_assembler_test_code_64_32.cpp 
+
+liberasm64_test_la_DEPENDENCIES = erasm/x64_assembler_test_code_64_32.hpp \
+				  erasm/x64_assembler_manual_test.cpp 
+
+liberasm86_test_la_SOURCES= erasm/x86_assembler_test_code_32_32.cpp 
+
+liberasm86_test_la_DEPENDENCIES = erasm/x86_assembler_test_code_32_32.hpp \
+			    	  erasm/x86_assembler_manual_test.cpp
 
 
 erasm_demo86_SOURCES= erasm/demo86.cpp
@@ -185,10 +193,10 @@ erasm_demo86_LDADD  = liberasm86.la
 
 x64_assembler_test_64_32_SOURCES  = \
 	erasm/x64_assembler_test_main_64_32.cpp
-x64_assembler_test_64_32_LDADD	  = $(GNU_DSM_LIB) liberasm64.la
+x64_assembler_test_64_32_LDADD	  = $(GNU_DSM_LIB) $(ERASM64_TEST_LDADD)
 x64_assembler_test_64_32_CPPFLAGS = # -DUSE_SAMPLE_HEADER
 
-x86_assembler_test_32_32_LDADD		= $(GNU_DSM_LIB) liberasm86.la
+x86_assembler_test_32_32_LDADD		= $(GNU_DSM_LIB) $(ERASM86_TEST_LDADD)
 x86_assembler_test_32_32_SOURCES	= \
 	erasm/x86_assembler_test_main_32_32.cpp
 
@@ -216,13 +224,13 @@ erasm_dsm_x64_performance_test_SOURCES = \
 	erasm/dsm_x64_auto_stm.hpp
 
 erasm_dsm_x64_performance_test_CXXFLAGS = -O3 -DTEST_MYDSM
-erasm_dsm_x64_performance_test_LDADD = $(GNU_DSM_LIB) liberasm64.la
+erasm_dsm_x64_performance_test_LDADD = $(GNU_DSM_LIB) $(ERASM64_TEST_LDADD)
 
 
 erasm_gdsm_x64_performance_test_SOURCES = \
 	erasm/dsm_x64_performance_test.cpp
 erasm_gdsm_x64_performance_test_CXXFLAGS = -O3
-erasm_gdsm_x64_performance_test_LDADD = $(GNU_DSM_LIB) liberasm64.la
+erasm_gdsm_x64_performance_test_LDADD = $(GNU_DSM_LIB) $(ERASM64_TEST_LDADD)
 
 
 
@@ -230,7 +238,7 @@ erasm_dsm_x64_test_SOURCES 	= erasm/dsm_x64_test_main.cpp \
 				  erasm/dsm_x64_auto_stm.hpp \
 				  erasm/x64_io.cpp
 
-erasm_dsm_x64_test_LDADD	= $(GNU_DSM_LIB) liberasm64.la
+erasm_dsm_x64_test_LDADD	= $(GNU_DSM_LIB) $(ERASM64_TEST_LDADD)
 erasm_dsm_x64_test_CXXFLAGS	= $(AM_CXXFLAGS)
 
 erasm_dsm_x64_unit_test_LDADD 	= $(GTEST_LIB)
@@ -280,28 +288,28 @@ erasm_dsm_x86_performance_test_SOURCES = \
 erasm_dsm_x86_performance_test_CXXFLAGS = \
 	 -DTEST_MYDSM  $(CXXFLAGS_PROF)
 erasm_dsm_x86_performance_test_LDFLAGS  =  $(CXXFLAGS_PROF)
-erasm_dsm_x86_performance_test_LDADD = liberasm86.la
+erasm_dsm_x86_performance_test_LDADD = $(ERASM86_TEST_LDADD)
 
 erasm_gdsm_x86_performance_test_SOURCES = \
 	erasm/dsm_x86_performance_test.cpp
 erasm_gdsm_x86_performance_test_CXXFLAGS = \
 	-DTEST_GDSM  $(CXXFLAGS_PROF)
 erasm_gdsm_x86_performance_test_LDFLAGS =  $(CXXFLAGS_PROF)
-erasm_gdsm_x86_performance_test_LDADD = $(GNU_DSM_LIB) liberasm86.la
+erasm_gdsm_x86_performance_test_LDADD = $(GNU_DSM_LIB) $(ERASM86_TEST_LDADD)
 
 
 erasm_dsm_x86_test_SOURCES 	= \
 	erasm/dsm_x86_test_main.cpp \
 	erasm/x86_io.cpp \
 	erasm/x64_io.cpp
-erasm_dsm_x86_test_LDADD		= liberasm86.la
+erasm_dsm_x86_test_LDADD		= $(ERASM86_TEST_LDADD)
 erasm_dsm_x86_test_CXXFLAGS	= $(AM_CXXFLAGS)
 
 erasm_dsm_x86_prof_SOURCES 	= \
 	erasm/dsm_x86_test_main.cpp \
 	erasm/x86_io.cpp \
 	erasm/x64_io.cpp
-erasm_dsm_x86_prof_LDADD		= liberasm86.la
+erasm_dsm_x86_prof_LDADD		= $(ERASM86_TEST_LDADD)
 erasm_dsm_x86_prof_CXXFLAGS	= -DPROFILING $(CXXFLAGS_PROF)
 erasm_dsm_x86_prof_LDFLAGS	= $(CXXFLAGS_PROF)
 
@@ -309,7 +317,7 @@ erasm_gdsm_x86_prof_SOURCES 	= \
 	erasm/dsm_x86_test_main.cpp \
 	erasm/x86_io.cpp \
 	erasm/x64_io.cpp
-erasm_gdsm_x86_prof_LDADD	= liberasm86.la $(GNU_DSM_LIB)
+erasm_gdsm_x86_prof_LDADD	= $(ERASM86_TEST_LDADD) $(GNU_DSM_LIB)
 erasm_gdsm_x86_prof_CXXFLAGS	= -DPROFILING -DTEST_GDSM $(CXXFLAGS_PROF)
 erasm_gdsm_x86_prof_LDFLAGS	= $(CXXFLAGS_PROF)
 

@@ -28,7 +28,8 @@ function compile_test_fail()
     
     STATEMENT="$1"
     printf "$TEMPLATE" "$STATEMENT" > $TMPCPP
-    if $CXX -fmax-errors=$MAX_ERROR -I$srcdir $CPPFLAGS $CXXFLAGS  -c  $TMPCPP;
+    #if $CXX -fmax-errors=$MAX_ERROR -I$srcdir $CPPFLAGS $CXXFLAGS  -c  $TMPCPP;
+    if $CXX -I$srcdir $CPPFLAGS $CXXFLAGS  -c  $TMPCPP;
     then
 	echo "Statement was not rejected:$STATEMENT"
 	return 1
