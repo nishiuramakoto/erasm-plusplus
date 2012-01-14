@@ -72,8 +72,8 @@ check_PROGRAMS 	= \
 pkglib_LTLIBRARIES 	= liberasm64.la liberasm86.la
 check_LTLIBRARIES 	= liberasm64_test.la liberasm86_test.la libgnu_dsm.la
 
-ERASM64_TEST_LDADD = liberasm64.la liberasm64_test.la
-ERASM86_TEST_LDADD = liberasm86.la liberasm86_test.la
+ERASM64_TEST_LDADD = liberasm64_test.la liberasm64.la 
+ERASM86_TEST_LDADD = liberasm86_test.la liberasm86.la 
 
 EXTRA_PROGRAMS	= \
 	erasm_dsm_x86_prof \
@@ -161,7 +161,7 @@ EXTRA_DIST	= erasm/x64_assembler_illegal_code.cpp \
 
 #nodist_data_DATA	=  $(REFERENCES) $(TEST_REFERENCE)
 
-AM_CPPFLAGS		= -include config.h -I $(srcdir)
+AM_CPPFLAGS		= -include config.h -I $(srcdir) -DERASM_NO_META_ASSERT
 BUILT_SOURCES		= $(ERASM_GENERATED_FILES)
 
 liberasm64_la_SOURCES 	= erasm/x64.cpp erasm/x64_assembler_impl.cpp \

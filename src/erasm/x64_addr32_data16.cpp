@@ -17,7 +17,11 @@ You should have received a copy of the GNU General Public License
 along with ERASM++; see the file COPYING3.  If not see
  <http://www.gnu.org/licenses/>. */
 
+#ifndef ERASM_NO_META_ASSERT
 #define ERASM_NO_META_ASSERT
+#else
+
+#endif
 #include "erasm/x64_addr32_data16.hpp"
 #include "erasm/x64_assembler_impl.hpp"
 namespace erasm {
