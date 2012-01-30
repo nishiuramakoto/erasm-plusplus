@@ -16,289 +16,169 @@
    You should have received a copy of the GNU General Public License
    along with ERASM++; see the file COPYING.  If not see
    <http://www.gnu.org/licenses/>.  */
+
+#ifndef FORMAT
+#define FORMAT C
+#endif
+
+#define CONCAT(X,Y) X ## Y
+#define PRINT_CODE_FUNC(X)  CONCAT(print_code_,X)
+#define PRINT_CODE PRINT_CODE_FUNC(FORMAT)
+
 #define ERASM_NO_META_ASSERT 1
-#include "meta_prelude.hpp"
-#include "erasm/dsm_x64.hpp"
-#include "erasm/x64_io.hpp"
-#include "erasm/x64_assembler_test_code_64_32.hpp"
 
+#include <erasm/meta_prelude.hpp>
+#include <erasm/dsm_x64.hpp>
+#include <erasm/dsm_x64_util.hpp>
+#include <erasm/faststream.hpp>
+#include <erasm/x64_addr64_data32.hpp>
+#include <erasm/x64_assembler_test_code_64_32.hpp>
 
-#include <cstring>
-#include <stdlib.h>
+#include <boost/timer.hpp>
+
 #include <iostream>
 #include <iomanip>
-#include <stdio.h>
-
 
 using namespace std;
 using namespace erasm::x64;
 
+inline ostream& print_code_A(ostream& os,const_code_ptr start,const_code_ptr end)
+{ return os ; }
 
-template<class X>
-struct Id
+inline ostream& print_code_B(ostream& os,const_code_ptr start,const_code_ptr end)
+{ return os << std::hex << (uint32_t) start << " " ; }
+
+inline ostream& print_code_C(ostream& os,const_code_ptr start,const_code_ptr end)
+{ return print_code(os,start,end) ; }
+
+
+struct MyDsm : SimpleDsm<PRINT_CODE>
 {
-   Id(const X& x) : x(x) {}
-   const X& x;
-};
-
-template<class X>
-struct FormattedInt
-{
-   FormattedInt(const X& x) : x(x) {}
-   const X& x;
-};
-
-
-namespace erasm { namespace prelude {
-
-DEFINE_FOREIGN_DATA1(Id,class);
-DEFINE_FOREIGN_DATA1(FormattedInt,class);
-
-template<class X>
-struct isBuiltinIntegerType_;
-
-template<class X>
-struct eval<isBuiltinIntegerType_<X> >
-{
-   typedef False result;
-};
-
-template<>
-struct eval<isBuiltinIntegerType_<int8_t> >
-{
-   typedef True result;
-};
-
-template<>
-struct eval<isBuiltinIntegerType_<uint8_t> >
-{
-   typedef True result;
-};
-
-template<>
-struct eval<isBuiltinIntegerType_<int16_t> >
-{
-   typedef True result;
-};
-
-template<>
-struct eval<isBuiltinIntegerType_<uint16_t> >
-{
-   typedef True result;
-};
-
-template<>
-struct eval<isBuiltinIntegerType_<int32_t> >
-{
-   typedef True result;
-};
-
-template<>
-struct eval<isBuiltinIntegerType_<uint32_t> >
-{
-   typedef True result;
-};
-
-template<>
-struct eval<isBuiltinIntegerType_<int64_t> >
-{
-   typedef True result;
-};
-
-template<>
-struct eval<isBuiltinIntegerType_<uint64_t> >
-{
-   typedef True result;
-};
-
-template<class X>
-struct isBuiltinIntegerType;
-template<class X>
-struct eval<isBuiltinIntegerType<X> >
-{
-   //   typedef typename eval<X>::result X_;
-   typedef typename eval<isBuiltinIntegerType_<X> > ::result result;
-};
-
-ERASM_META_ASSERT_EQUAL((isBuiltinIntegerType<int>),(True));
-ERASM_META_ASSERT_EQUAL((isBuiltinIntegerType<Zero>),(False));
-
-}}
-
-
-template<class X> inline ostream& operator<< (ostream& os,Id<X> x)
-{ return os << x.x; }
-
-template<class X> inline ostream& operator<< (ostream& os,FormattedInt<X> x)
-{ return os << showbase << hex << (int)x.x; }
-
-
-using namespace erasm::prelude;
-template<class X>
-struct FormattedOp
-   : eval<if_<isBuiltinIntegerType<X> , 
-	      FormattedInt<X> , 
-	      Id<X> > > :: result
-{
-   typedef typename  eval<if_<isBuiltinIntegerType<X> , 
-			      FormattedInt<X> , 
-			      Id<X> > > :: result   base;
-   FormattedOp(const X& x) 
-      : base(x)
-      {}
-   const base & get_base() const
-      { return *this ; }
-};
-
-template<class X> inline ostream& operator<< (ostream& os,FormattedOp<X> x)
-{  return os << x.get_base(); }
-
-
-template<class X> inline FormattedOp<X> format(const X& x)
-{ return FormattedOp<X>(x); }
-
-
-
-template<class Insn>
-inline 
-ostream& 
-print_instruction(ostream& os,
-		  const Insn& insn)
-{
-   print_code(os,insn.start,insn.end);
-   os << Insn::mnemonic << endl;   
-   return os;
-}
-
-template<class Insn,class Op>
-inline
-ostream& 
-print_instruction(ostream& os,
-		  const Insn& insn,
-		  const Op  & op1)
-{
-   print_code(os,insn.start,insn.end);
-   os << Insn::mnemonic
-      << " " << format(op1) << endl;
-   return os;
-}
-
-template<class Insn,class Op1,class Op2>
-inline
-ostream& 
-print_instruction(ostream& os,
-		  const Insn& insn,
-		  const Op1  & op1,
-		  const Op2  & op2)
-{
-   print_code(os,insn.start,insn.end);
-   os << Insn::mnemonic
-      << " " << format(op1)
-      << "," << format(op2) << endl;
-   return os;
-}
-
-template<class Insn,class Op1,class Op2,class Op3>
-inline
-ostream& 
-print_instruction(ostream& os,
-		  const Insn& insn,
-		  const Op1  & op1,
-		  const Op2  & op2,
-		  const Op3  & op3)
-{
-   print_code(os,insn.start,insn.end);
-   os << Insn::mnemonic 
-      << " " << format(op1) 
-      << "," << format(op2) 
-      << "," << format(op3) << endl;
-   return os;
-}
-
-
-
-
-template<class Stream>
-struct Disasm
-{
-   const_code_ptr start;
+   typedef SimpleDsm<PRINT_CODE>  base;
    const_code_ptr end;
-   Stream& os;
-
-   Disasm(const_code_ptr start,const_code_ptr end,Stream& os) 
-      : start(start),end(end),os(os) 
+   MyDsm(const_code_ptr start,const_code_ptr end,ostream& os = erasm::cout) 
+      : base(start,os) ,end(end)
       {}
-   
-   action_result_type cont(const InstructionData& params)
-      {
-	 return make_pair(params.end,
-			  params.end < end ? 
-			  ACTION_CONTINUE : ACTION_FINISH );
-      }
 
-   template<class Insn>
+   using base::action;
+
    action_result_type
-   action(const Insn& insn)
+   action(const Ret& insn)
       {
-	 print_instruction(os,insn);
-	 return cont(insn.data());
+	 if (insn.end >= end) {
+	    return finish(insn);
+	 }
+	 print_code(os(),insn);
+	 print_instruction(os(),insn) << endl;
+	 return next(insn);
       }
-
-   template<class Insn,class Op1>
-   action_result_type
-   action(const Insn& insn,
-	  const Op1& op1)
-      {
-	 print_instruction(os,insn,op1);
-	 return cont(insn.data());
-      }
-
-   template<class Insn,class Op1,class Op2>
-   action_result_type
-   action(const Insn& insn,
-	  const Op1& op1,
-	  const Op2& op2)
-      {
-	 print_instruction(os,insn,op1,op2);
-	 return cont(insn.data());
-      }
-
-   template<class Insn,class Op1,class Op2,class Op3>
-   action_result_type
-   action(const Insn& insn,
-	  const Op1& op1,
-	  const Op2& op2,
-	  const Op3& op3)
-      {
-	 print_instruction(os,insn,op1,op2,op3);
-	 return cont(insn.data());
-      }
-   
-   const_code_ptr
-   error(const InstructionData& data)
-      {
-	 print_code(os,data.start,data.start+5);
-	 os << "decode error:"   << data.action_code << endl;
-	 os << "decoded length:" << data.start - start << endl;
-	 return data.start;
-      }
-
 };
 
-byte_t buff[1024 * 1024 ];
+byte_t buff[1024 * 1024 * 10 ];
 
-int main()
+int gen_code(int n)
 {
+   using namespace erasm::x64::addr64::data32;
    code_ptr p = buff;
-   p += erasm::x64::addr64::data32::gen_manual_test(p);
-   p += erasm::x64::addr64::data32::gen_auto_test(p);
+   for (int i=0; i<n;i++) {
+      p += gen_manual_test(p);
+      p += gen_auto_test(p);      
+   }
+   int len = p - buff;
 
-   int len = p-buff;
+   p += ret(p);
+   return len;
+}
 
-   typedef Disasm<ostream> dsm_type;
+#ifdef TEST_GDSM
+int dsm(code_ptr beg,code_ptr end )
+{
+   cerr << "testing gdsm" << endl;
+   using namespace gnu_dsm;
+   Disassembler dsm(true,false,"intel,i386,addr64,data32");
+   int count = dsm.print(beg,end);
+   return count;
+}
+#elif defined TEST_UDIS
+int dsm(code_ptr beg,code_ptr end )
+{
+   cerr << "testing udis86" << endl;
+   ud_t ud_obj;
+   unsigned char* p = (unsigned char*)  beg;
+   size_t size = end - beg;
+   int count = 0;
 
-   dsm_type   dsm(buff,buff+len  ,cout);
-   decode_instruction<dsm_type,true,true>(buff,dsm);
+   ud_init(&ud_obj);
+   ud_set_input_buffer(&ud_obj, p , size);
+
+   ud_set_mode(&ud_obj, 64);
+
+   ud_set_syntax(&ud_obj, UD_SYN_INTEL);
+   ud_set_vendor(&ud_obj, UD_VENDOR_INTEL);
+
+   int len;
+   while (len = ud_disassemble(&ud_obj)) {
+      unsigned char* pc = beg + ud_obj.pc;
+      //printf("%08x",ud_obj.pc);
+      PRINT_CODE(::erasm::cout,pc, pc + len);	 
+      printf("\t%s\n", ud_insn_asm(&ud_obj));
+      count ++;
+   }
+   return count;
+}
+#elif defined TEST_DR
+int dsm(code_ptr beg,code_ptr end )
+{
+   cerr << "testing dr" << endl;
+   int count = 0;
+   disassemble_set_syntax(DR_DISASM_INTEL);
+
+   byte* p = (byte*) beg;
+
+   while (p < end) {
+      byte* next = disassemble(GLOBAL_DCONTEXT,p,1);
+      if (next) {
+	 p = next ; 
+      } else {
+	 p ++;
+      }
+      count ++;
+   }
+   return count;
+}
+#else
+int dsm(code_ptr beg,code_ptr end )
+{
+   cerr << "testing mydsm" << endl;
+   typedef MyDsm dsm_type;
+   dsm_type   mydsm(beg,end);
+   erasm::x64::addr64::data32::decode<dsm_type>(buff,mydsm);
+   return mydsm.get_counter();
+}
+#endif
+
+
+int main(int argc,char**argv)
+{
+#ifdef PROFILING
+   int n = 1000;
+#else
+   int n = 1;
+#endif
+
+   {
+      int len = gen_code(n);
+
+      boost::timer t0;
+
+      int count = dsm(buff,buff+len);
+
+      float elapsed = t0.elapsed();
+      cerr << "elapsed time = " << elapsed << " sec" << endl;
+      cerr << "number of bytes:" << len << endl;
+      cerr << "number of instructions:" << count << endl;
+   }
+
 
    return 0;
 }

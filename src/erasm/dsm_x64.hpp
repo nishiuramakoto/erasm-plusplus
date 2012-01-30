@@ -2092,7 +2092,7 @@ template<class Action,
 	 >
 inline
 const_code_pointer_type
-decode_instruction(const_code_pointer_type decode_start,Action & action)
+decode(const_code_pointer_type decode_start,Action & action)
 {
    using namespace impl;
    InstructionData params;
@@ -2137,6 +2137,17 @@ decode_instruction(const_code_pointer_type decode_start,Action & action)
 
    return action.error(params);
 }
+
+namespace addr64 { namespace data32 {
+template<class Action>
+inline
+const_code_pointer_type
+decode(const_code_pointer_type decode_start,Action & action)
+{ 
+   return ::erasm::x64::decode<Action,true,true>
+      (decode_start,action) ; 
+}
+}}
 
 }}
 

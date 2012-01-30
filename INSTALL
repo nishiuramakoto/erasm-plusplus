@@ -1,9 +1,36 @@
 ---------------------------------
 ERASM++ Installation Instructions
 ---------------------------------
+ * Installation
  * Supported Platforms
  * Requirements
- * Installation
+
+INSTALLATION
+------------ 
+
+I assume you have downloaded erasm-plusplus-0.11.tar.gz from **,
+unpacked it,and cd'ed into the base directory.
+
+./configure --prefix=your-private-directory 
+make 
+make install
+
+This will install the necessary headers under PREFIX/include/erasm,
+and libraries under PREFIX/lib.
+
+We don't recommend installing on the system directories,as ERASM++ is still
+in its alpha stage.
+
+Note that due to the lack of standard C++ ABI, it is necessary to build the library
+for *every* major version of every compiler toolset you use. So we recommend
+something like (say) ./configure --prefix=$HOME/gcc-4.6 in the above example.
+
+We have several options to ease the installation.
+* Make Erasm++ a header-only library.
+* Make Erasm++ a thin-wrapper around an equivalent, but more portable C library where possible.
+* Adopt Boost-like library naming scheme and automate above process.
+
+Each solution has its pros and cons. If you have an idea,please let me know!
 
 SUPPORTED PLATFORMS
 ------------------
@@ -14,23 +41,23 @@ Debian Testing(squeeze) running on Intel Celeron M 1.3GHz,
 g++ version 4.5.3.
 
 Windows 7 32-bit running on Intel Pentium Dual Core 2.4GHz,
-mingw g++ version 4.5.4.
+mingw g++ version 4.5.4 and 4.6.1.
 
 Unfortunately,g++ 4.6.1 won't pass 'make check'. (it will eat up all the
 user space. See README for the details.) However, there should be no problem
 just to compile and install the library.
 
-cl.exe bundled with Visual C++ 2011 Express looks fine,but not tested 
+cl.exe bundled with Visual C++ 2011 Express looks fine, but not tested 
 thoroughly yet.
 
-Please report if you have succeeded or failed to build and use ERASM++ on
+Please report at nishiuramakoto@gmail.com if you have succeeded or failed to build and use Erasm++ on
 other systems.
 
 
 REQUIREMENTS
 ------------
 
-ERASM++ requires:
+Erasm++ requires:
 
 * GNU make
 * Boost static assert
@@ -51,21 +78,7 @@ pass 'make check':
 * libopcodes (bundled with GNU binutils)
 * GHC (Glasgow Haskell Compiler) >= 7.0.3
 * cabal
-* parsec,uulib,HUnit,QuickCheck >=2.4,HaskellForMaths >=0.4.0,fgl 
+* parsec,uulib,HUnit,QuickCheck >=2.4,HaskellForMaths >=0.4.0,fgl,pointless-haskell
   all of which are available through 'cabal install'.
 
-
-INSTALLATION
-------------
-git clone git://github.com/nishiuramakoto/erasm-plusplus.git
-cd erasm-plusplus
-./configure --prefix=your-private-directory
-make
-make install
-
-This will install the necessary headers under PREFIX/include/erasm,
-and libraries under PREFIX/lib.
-
-We don't recommend installing on the system directories,as ERASM++ is still
-in its alpha stage.
 

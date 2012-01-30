@@ -159,5 +159,5 @@ ghci_%: %.hs
 qcheck_% : %.hs
 	quickCheck +names $<
 
-distclean-local: cabal_clean
+maintainerclean-local: cabal_clean
 

@@ -43,7 +43,7 @@ function check_file()
     CODE_FILE=$1
     echo Checking illegal code in $CODE_FILE
 
-    FIRST_TEST="add(p,eax,0);"
+    FIRST_TEST="add(p,eax,0u);"
     if compile_test_fail "$FIRST_TEST" ;then
 	echo "FAIL (compilation failed)"
 	exit 1

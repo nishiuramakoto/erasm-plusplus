@@ -16,235 +16,48 @@
    You should have received a copy of the GNU General Public License
    along with ERASM++; see the file COPYING.  If not see
    <http://www.gnu.org/licenses/>.  */
+
+#ifndef FORMAT
+#define FORMAT C
+#endif
+
+#define CONCAT(X,Y) X ## Y
+#define PRINT_CODE_FUNC(X)  CONCAT(print_code_,X)
+#define PRINT_CODE PRINT_CODE_FUNC(FORMAT)
+
 #define ERASM_NO_META_ASSERT 1
-#include "meta_prelude.hpp"
-#include "erasm/dsm_x86.hpp"
-#include "erasm/x86_io.hpp"
-#include "erasm/x86_assembler_test_code_32_32.hpp"
-#include "erasm/x86_addr32_data32.hpp"
+
 #include "gnu_disassembler.hpp"
+#include <erasm/dsm_x86.hpp>
+#include <erasm/dsm_x86_util.hpp>
+#include <erasm/x86_assembler_test_code_32_32.hpp>
+#include <erasm/x86_addr32_data32.hpp>
+#include <erasm/faststream.hpp>
 #include <boost/timer.hpp>
 
-#include <sstream>
-#include <string>
-#include <cstring>
-#include <stdlib.h>
-#include <iostream>
-#include <iomanip>
-#include <stdio.h>
+#ifdef TEST_UDIS
+#include <udis86.h>
+#endif
 
-#include "mystream.hpp"
+#ifdef TEST_DR
+#include <dr_api.h>
+#endif
 
-using std::ostream;
-using std::hex;
-using std::showbase;
-using std::cout;
-using std::cerr;
-using std::make_pair;
-using std::string;
-using std::ostringstream;
+using erasm::x86::const_code_ptr;
+
+inline std::ostream& print_code_A(std::ostream& os,const_code_ptr start,const_code_ptr end)
+{ return os ; }
+
+inline std::ostream& print_code_B(std::ostream& os,const_code_ptr start,const_code_ptr end)
+{ return os << std::hex << (uint32_t) start << " " ; }
+
+inline std::ostream& print_code_C(std::ostream& os,const_code_ptr start,const_code_ptr end)
+{ return erasm::x86::print_code(os,start,end) ; }
 
 
+using namespace std;
 using namespace erasm::x86;
-const char endl = '\n';
 
-inline ostream& operator<< (ostream& os,const FarPtr16& ptr)
-{
-   os << showbase << hex << ptr.selector <<':'  
-      << showbase << hex << ptr.offset  ;
-   return os;
-}
-
-inline ostream& operator<< (ostream& os,const FarPtr32& ptr)
-{
-   os << showbase << hex << ptr.selector <<':'  
-      << showbase << hex << ptr.offset  ;
-   return os;
-}
-
-
-
-template<class X>
-struct Formatted
-{
-   Formatted(const X& x) : x(x) { }
-   const X& x;
-};
-
-template<class X>
-inline ostream & operator<< (ostream& os,const Formatted<X>& x)
-{ return os << x.x; }
-
-template<>
-inline ostream & operator<< (ostream& os,const Formatted<uint8_t>& x)
-{  return os << showbase << hex << (int) x.x;}
-
-template<>
-inline ostream & operator<< (ostream& os,const Formatted<uint16_t>& x)
-{  return os << showbase << hex << (int) x.x; }
-
-template<>
-inline ostream & operator<< (ostream& os,const Formatted<uint32_t>& x)
-{  return os << showbase << hex << (int) x.x; }
-
-template<>
-inline ostream & operator<< (ostream& os,const Formatted<int8_t>& x)
-{  return os << showbase << hex << (int) x.x;}
-
-template<>
-inline ostream & operator<< (ostream& os,const Formatted<int16_t>& x)
-{  return os << showbase << hex << (int) x.x; }
-
-template<>
-inline ostream & operator<< (ostream& os,const Formatted<int32_t>& x)
-{  return os << showbase << hex << (int) x.x; }
-
-template<class X> inline Formatted<X> format(const X& x)
-{ return Formatted<X>(x) ; }
-
-
-template<class Insn>
-ostream&
-print_instruction(ostream& os,
-		  const Insn& insn)
-{
-   print_code(os,insn.start,insn.end);
-   os << Insn::mnemonic << endl;
-   return os;
-}
-
-template<class Insn,class Op>
-ostream& 
-print_instruction(ostream& os,
-		  const Insn& insn,
-		  const Op  & op1)
-{
-   print_code(os,insn.start,insn.end);
-   os << Insn::mnemonic;
-   os << " " << format(op1) << endl;
-   return os;
-}
-
-template<class Insn,class Op1,class Op2>
-ostream& 
-print_instruction(ostream& os,
-		  const Insn& insn,
-		  const Op1  & op1,
-		  const Op2  & op2)
-{
-   print_code(os,insn.start,insn.end);
-   os << Insn::mnemonic;
-   os << " " << format(op1);
-   os << "," << format(op2) << endl;
-   return os;
-}
-
-template<class Insn,class Op1,class Op2,class Op3>
-ostream& 
-print_instruction(ostream& os,
-		  const Insn& insn,
-		  const Op1  & op1,
-		  const Op2  & op2,
-		  const Op3  & op3)
-{
-   print_code(os,insn.start,insn.end);
-   os << Insn::mnemonic ;
-   os << " " << format(op1) ;
-   os << "," << format(op2) ;
-   os << "," << format(op3) << endl;
-   return os;
-}
-
-
-struct Disasm
-{
-   const_code_ptr start;
-   const_code_ptr end;
-   ostream& os;
-   int count;
-
-   Disasm(const_code_ptr start,const_code_ptr end,ostream& os) 
-      : start(start),end(end),os(os) ,count(0)
-      {
-      }
-   
-   action_result_type finish(const InstructionData& params)
-      {
-	 return make_pair(params.end, ACTION_FINISH);
-      }
-
-   action_result_type cont(const InstructionData& params)
-      {
-	 count++;
-	 return make_pair(params.end, ACTION_CONTINUE);
-      }
-
-   action_result_type check(const InstructionData& params)
-      {
-	 if (params.end >= end) {
-	    return finish(params);
-	 }
-	 return cont(params);
-      }
-
-   action_result_type
-   action(const Ret& insn)
-      {
-	 if (insn.end >= end) {
-	    return finish(insn);
-	 }
-	 print_instruction(os,insn);
-	 return cont(insn);
-      }
-
-   template<class Insn>
-   action_result_type
-   action(const Insn& insn)
-      {
-	 print_instruction(os,insn);
-	 return cont(insn.data());
-      }
-
-   template<class Insn,class Op1>
-   action_result_type
-   action(const Insn& insn,
-	  const Op1& op1)
-      {
-	 print_instruction(os,insn,op1);
-	 return cont(insn.data());
-      }
-
-   template<class Insn,class Op1,class Op2>
-   action_result_type
-   action(const Insn& insn,
-	  const Op1& op1,
-	  const Op2& op2)
-      {
-	 print_instruction(os,insn,op1,op2);
-	 return cont(insn.data());
-      }
-
-   template<class Insn,class Op1,class Op2,class Op3>
-   action_result_type
-   action(const Insn& insn,
-	  const Op1& op1,
-	  const Op2& op2,
-	  const Op3& op3)
-      {
-	 print_instruction(os,insn,op1,op2,op3);
-	 return cont(insn.data());
-      }
-   
-   const_code_ptr
-   error(const InstructionData& data)
-      {
-	 print_code(os,data.start,data.start+5);
-	 os << "decode error:"   << data.action_code << endl;
-	 os << "decoded length:" << data.start - start << endl;
-	 return data.start;
-      }
-
-};
 
 
 byte_t buff[1024 * 1024 * 10 ];
@@ -272,16 +85,88 @@ int dsm(code_ptr beg,code_ptr end )
    int count = dsm.print(beg,end);
    return count;
 }
+#elif defined TEST_UDIS
+int dsm(code_ptr beg,code_ptr end )
+{
+   cerr << "testing udis86" << endl;
+   ud_t ud_obj;
+   unsigned char* p = (unsigned char*)  beg;
+   size_t size = end - beg;
+   int count = 0;
+
+   ud_init(&ud_obj);
+   //ud_set_input_file(&ud_obj, stdin);
+   ud_set_input_buffer(&ud_obj, p , size);
+
+   //ud_set_mode(&ud_obj, 64);
+   ud_set_mode(&ud_obj, 32);
+
+   ud_set_syntax(&ud_obj, UD_SYN_INTEL);
+   ud_set_vendor(&ud_obj, UD_VENDOR_INTEL);
+
+   int len;
+   while (len = ud_disassemble(&ud_obj)) {
+      unsigned char* pc = beg + ud_obj.pc;
+      //printf("%08x",ud_obj.pc);
+      PRINT_CODE(::erasm::cout,pc, pc + len);	 
+      printf("\t%s\n", ud_insn_asm(&ud_obj));
+      count ++;
+   }
+   return count;
+}
+#elif defined TEST_DR
+int dsm(code_ptr beg,code_ptr end )
+{
+   cerr << "testing dr" << endl;
+   void * context = dr_standalone_init();
+   int count = 0;
+   disassemble_set_syntax(DR_DISASM_INTEL);
+
+   byte* p = (byte*) beg;
+
+   while (p < end) {
+      byte* next = disassemble(context,p,STDOUT);
+      if (next) {
+	 p = next ; 
+      } else {
+	 p ++;
+      }
+      count ++;
+   }
+   return count;
+}
 #else
-my::omystream<526 -1>  myout(stdout);
-//my::nullstream  myout;
+
+struct MyDsm : SimpleDsm<PRINT_CODE>
+{
+   typedef SimpleDsm<PRINT_CODE>  base;
+   const_code_ptr end;
+   MyDsm(const_code_ptr start,const_code_ptr end,ostream& os = erasm::cout) 
+      : base(start,os) ,end(end)
+      {}
+
+   using base::action;
+
+   action_result_type
+   action(const Ret& insn)
+      {
+	 if (insn.end >= end) {
+	    return finish(insn);
+	 }
+	 print_code(os(),insn);
+	 print_instruction(os(),insn) << endl;
+	 return next(insn);
+      }
+};
+
+
 int dsm(code_ptr beg,code_ptr end )
 {
    cerr << "testing mydsm" << endl;
-   typedef Disasm dsm_type;
-   dsm_type   mydsm(beg,end  , myout);
-   decode_instruction<dsm_type,true,true>(buff,mydsm);
-   return mydsm.count;
+   typedef MyDsm dsm_type;
+   dsm_type   mydsm(beg,end);
+   erasm::x86::addr32::data32::decode<dsm_type>(buff,mydsm);
+   return mydsm.get_counter();
 }
 #endif
 
@@ -296,7 +181,6 @@ int main(int argc,char**argv)
 
    {
       int len = gen_code(n);
-
 
       boost::timer t0;
 

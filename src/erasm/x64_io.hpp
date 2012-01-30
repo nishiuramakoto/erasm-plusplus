@@ -90,6 +90,9 @@ inline std::ostream& operator<< (std::ostream& os,const WordOffset32& offs);
 inline std::ostream& operator<< (std::ostream& os,const DwordOffset32& offs);
 inline std::ostream& operator<< (std::ostream& os,const QwordOffset32& offs);
 
+std::ostream& operator<< (std::ostream& os,const FarPtr16& ptr);
+std::ostream& operator<< (std::ostream& os,const FarPtr32& ptr);
+
 
 std::ostream&
 print_code(std::ostream& os,
@@ -281,6 +284,100 @@ inline std::ostream& operator<<(std::ostream& os,Segment seg)
       return os;
    }
 }
+
+
+template<class X>
+struct FormatInt
+{
+   FormatInt(const X& x) : x(x) { }
+   const X& x;
+};
+
+template<class X>
+inline std::ostream & operator<< (std::ostream& os,const FormatInt<X>& x)
+{ return os << x.x; }
+
+template<>
+inline std::ostream & operator<< (std::ostream& os,const FormatInt<uint8_t>& x)
+{  return os << std::showbase << std::hex << (int) x.x;}
+
+template<>
+inline std::ostream & operator<< (std::ostream& os,const FormatInt<uint16_t>& x)
+{  return os << std::showbase << std::hex << (int) x.x; }
+
+template<>
+inline std::ostream & operator<< (std::ostream& os,const FormatInt<uint32_t>& x)
+{  return os << std::showbase << std::hex << (int) x.x; }
+
+template<>
+inline std::ostream & operator<< (std::ostream& os,const FormatInt<int8_t>& x)
+{  return os << std::showbase << std::hex << (int) x.x;}
+
+template<>
+inline std::ostream & operator<< (std::ostream& os,const FormatInt<int16_t>& x)
+{  return os << std::showbase << std::hex << (int) x.x; }
+
+template<>
+inline std::ostream & operator<< (std::ostream& os,const FormatInt<int32_t>& x)
+{  return os << std::showbase << std::hex << (int) x.x; }
+
+template<class X> inline FormatInt<X> format(const X& x)
+{ return FormatInt<X>(x) ; }
+
+
+
+template<class Insn>
+inline
+std::ostream&
+print_instruction(std::ostream& os,
+		  const Insn& insn)
+{
+   os << Insn::mnemonic;
+   return os;
+}
+
+template<class Insn,class Op>
+inline
+std::ostream& 
+print_instruction(std::ostream& os,
+		  const Insn& insn,
+		  const Op  & op1)
+{
+   os << Insn::mnemonic;
+   os << " " << format(op1);
+   return os;
+}
+
+template<class Insn,class Op1,class Op2>
+inline
+std::ostream& 
+print_instruction(std::ostream& os,
+		  const Insn& insn,
+		  const Op1  & op1,
+		  const Op2  & op2)
+{
+   os << Insn::mnemonic;
+   os << " " << format(op1);
+   os << "," << format(op2);
+   return os;
+}
+
+template<class Insn,class Op1,class Op2,class Op3>
+inline
+std::ostream& 
+print_instruction(std::ostream& os,
+		  const Insn& insn,
+		  const Op1  & op1,
+		  const Op2  & op2,
+		  const Op3  & op3)
+{
+   os << Insn::mnemonic ;
+   os << " " << format(op1) ;
+   os << "," << format(op2) ;
+   os << "," << format(op3) ;
+   return os;
+}
+
 
 }}
 

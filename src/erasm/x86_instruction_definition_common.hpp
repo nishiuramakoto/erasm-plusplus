@@ -31,26 +31,27 @@ using x64::ACTION_ERROR;
 using x64::action_code_type;
 using x64::action_result_type;
 
-struct InstructionData
-{
-   const_code_ptr start;
-   const_code_ptr opcode_start;
-   const_code_ptr end;
+// struct InstructionData
+// {
+//    const_code_ptr start;
+//    const_code_ptr opcode_start;
+//    const_code_ptr end;
 
-   action_code_type action_code;
+//    action_code_type action_code;
 
-   prefix_bitset  prefix;
-   Segment segment;
-   bool is_data16;
-   bool is_addr32;
+//    prefix_bitset  prefix;
+//    Segment segment;
+//    bool is_data16;
+//    bool is_addr32;
 
-   InstructionData& data()
-      { return *this; }
+//    InstructionData& data()
+//       { return *this; }
 
-   const InstructionData& data() const
-      { return *this; }
-};
+//    const InstructionData& data() const
+//       { return *this; }
+// };
 
+using x64::InstructionData;
 
 }}
 

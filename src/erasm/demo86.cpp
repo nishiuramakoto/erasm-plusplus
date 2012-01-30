@@ -12,7 +12,7 @@ int main(int argc,char**argv)
 
    byte_t buf[100];
    byte_t *p = buf;
-   int32_t x = 2;
+   uint32_t x = 2;
 
    p += mov(p,eax,dword_ptr[esp+4]);
    p += add(p,eax,x);

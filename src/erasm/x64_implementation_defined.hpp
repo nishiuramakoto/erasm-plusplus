@@ -58,10 +58,10 @@ typedef const byte_t * const_code_pointer;
 typedef const byte_t * const_code_pointer_type;
 
 // TODO:these types should be redefined to be unsigned types
-typedef int8_t  imm8_t;
-typedef int16_t imm16_t;
-typedef int32_t imm32_t;
-typedef int64_t imm64_t;
+typedef uint8_t  imm8_t;
+typedef uint16_t imm16_t;
+typedef uint32_t imm32_t;
+typedef uint64_t imm64_t;
 
 typedef int8_t  rel8_t;
 typedef int16_t rel16_t;

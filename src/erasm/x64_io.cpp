@@ -17,7 +17,8 @@
    along with ERASM++; see the file COPYING.  If not see
    <http://www.gnu.org/licenses/>.  */
 #define ERASM_NO_META_ASSERT 1
-#include "erasm/x64_io.hpp"
+#include <erasm/x64_io.hpp>
+#include <erasm/faststream.hpp>
 
 #include <cstring>
 #include <stdlib.h>
@@ -28,13 +29,20 @@ namespace erasm {  namespace x64 {
 
 using namespace std;
 
+ostream& operator<< (ostream& os,const FarPtr16& ptr)
+{
+   os << showbase << hex << ptr.selector <<':'  
+      << showbase << hex << ptr.offset  ;
+   return os;
+}
 
-template<class X>
-inline const X& format(const X& x)
-{ return x; }
 
-inline int format(imm8_t x)
-{ return x; }
+ostream& operator<< (ostream& os,const FarPtr32& ptr)
+{
+   os << showbase << hex << ptr.selector <<':'  
+      << showbase << hex << ptr.offset  ;
+   return os;
+}
 
 
 struct PrintPtr
@@ -271,25 +279,98 @@ ostream& print (ostream& os,const PtrBase& r)
 };
 }
 
+static inline
+char hexchar(int x)
+{
+   if (x < 0xa) {
+      return '0' + x ;
+   } else {
+      return 'a' + (x - 0xa);
+   }
+}
+
+static inline
+void
+print_opcode(ostream& os,
+	     const_code_pointer_type start,
+	     const_code_pointer_type end)
+{ 
+   static char buf[200];
+
+   int len = end - start;
+   int counter=0;
+   const int width = 20;
+
+   for (int i=0;i<len;i++) {
+      unsigned char x = start[i];
+      buf[counter]   = hexchar(x/16);
+      buf[counter+1] = hexchar(x%16);
+      counter += 2;
+   }
+
+   if (counter < width) {
+      memset(&buf[counter],' ',width - counter);
+      counter = 20;
+   }
+
+   buf[counter]=0;
+
+   os << buf;
+}
+
+// ostream&
+// print_code(ostream& os,
+// 	   const_code_pointer_type start,
+// 	   const_code_pointer_type end)
+// {
+//    const int width=20;
+//    int len = end-start;
+//    for (int i=0;i<len;i++) {
+//       os << setfill('0') << setw(2) << hex << noshowbase 
+// 	 << (unsigned int) start[i];
+//    }
+//    for (int i=len*2;i<width;i++) {
+//       os << " ";
+//    }
+//    os << setfill('0') << setw(8) << hex  << (unsigned int) start << " " 
+//       << setfill(' ') << setw(2) << dec  << len << " ";
+   
+//    return os;
+// }
+
+
+static inline
+void print_hex(ostream& os,unsigned int x)
+{
+   char buf[20];
+
+   int len = 8;
+   int counter=0;
+   unsigned char* start = (unsigned char*) &x;
+
+   for (int i=0;i<len;i++) {
+      unsigned char x = start[i];
+      buf[counter]   = hexchar(x/16);
+      buf[counter+1] = hexchar(x%16);
+      counter += 2;
+   }
+   buf[counter] = 0;
+
+   os << buf;
+}
+
 ostream&
 print_code(ostream& os,
 	   const_code_pointer_type start,
 	   const_code_pointer_type end)
 {
-   const int width=20;
-   int len = end-start;
-   for (int i=0;i<len;i++) {
-      os << setfill('0') << setw(2) << hex << noshowbase 
-	 << (unsigned int) start[i];
-   }
-   for (int i=len*2;i<width;i++) {
-      os << " ";
-   }
-   os << setfill('0') << setw(8) << hex  << (unsigned int) start << " " 
-      << setfill(' ') << setw(2) << dec  << len << " ";
-   
+   int len = end - start;
+   print_opcode(os,start,end);
+   os << noshowbase << setfill('0') << setw(8) << hex  << (unsigned int) start ;
+   os << " "  << setfill(' ') << setw(2) << dec  << len << " ";
    return os;
 }
+
 
 FILE*
 print_code(FILE* os,
@@ -297,10 +378,8 @@ print_code(FILE* os,
 	   const_code_pointer_type end)
 {
    using namespace std;
-   ostringstream oss;
-   print_code(oss,start,end);
-   string s(oss.str());
-   fputs(s.c_str(),os);
+   ::erasm::ofaststream<500> s(os);
+   print_code(s,start,end);
    return os;
 }
 

@@ -19,3 +19,9 @@
 
 SUBDIRS= . src
 ACLOCAL_AMFLAGS= -I m4
+
+dist_data_DATA = doc/manual.pdf \
+		 demo/demo86.cpp \
+		 demo/demo64.cpp \
+		 demo/dsm86_counter.cpp 
+

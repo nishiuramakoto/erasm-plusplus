@@ -135,7 +135,7 @@ int main()
       printf("testing mydsm\n");
 
       Counter mydsm(buff,buff+len);
-      decode_instruction<Counter,true,true>(buff,mydsm);
+      decode<Counter,true,true>(buff,mydsm);
       int counter = mydsm.counter;
 #else
       printf("testing gdsm\n");

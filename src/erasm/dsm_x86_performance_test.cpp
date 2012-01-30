@@ -25,25 +25,17 @@
 #include "gnu_disassembler.hpp"
 #include <boost/timer.hpp>
 
-#include <sstream>
-#include <string>
-#include <cstring>
-#include <stdlib.h>
+#ifdef TEST_UDIS
+#include <udis86.h>
+#endif
+
+#ifdef TEST_DR
+#include <dr_api.h>
+#endif
+
 #include <iostream>
-#include <iomanip>
-#include <stdio.h>
 
-
-using std::ostream;
-using std::hex;
-using std::showbase;
-using std::cout;
-using std::endl;
-using std::cerr;
-using std::make_pair;
-using std::string;
-using std::ostringstream;
-
+using namespace std;
 using namespace erasm::x86;
 
 struct Counter
@@ -74,14 +66,6 @@ struct Counter
 	 counter ++;
 	 return check(insn);
       }
-
-   action_result_type
-   action(const Jmp& insn)
-      {
-	 counter ++;
-	 return check(insn);
-      }
-
 
    template<class Insn>
    action_result_type
@@ -153,7 +137,7 @@ int counter(code_ptr start,code_ptr end)
 {
    cerr << "testing mydsm" << endl;
    Counter mydsm(start,end);
-   decode_instruction<Counter,true,true>(buff,mydsm);
+   decode<Counter,true,true>(buff,mydsm);
    int counter = mydsm.counter;
    return counter;
 }
@@ -172,6 +156,59 @@ int counter(code_ptr start,code_ptr end)
    }
    return counter;
 }
+#elif defined TEST_UDIS
+int counter(code_ptr beg,code_ptr end )
+{
+   cerr << "testing udis86" << endl;
+   ud_t ud_obj;
+   unsigned char* p = (unsigned char*)  beg;
+   size_t size = end - beg;
+   int count = 0;
+
+   ud_init(&ud_obj);
+   //ud_set_input_file(&ud_obj, stdin);
+   ud_set_input_buffer(&ud_obj, p , size);
+
+   //ud_set_mode(&ud_obj, 64);
+   ud_set_mode(&ud_obj, 32);
+
+   ud_set_syntax(&ud_obj, UD_SYN_INTEL);
+
+   while (ud_disassemble(&ud_obj)) {
+      //printf("\t%s\n", ud_insn_asm(&ud_obj));
+      count ++;
+   }
+   return count;
+}
+
+#elif defined TEST_DR
+int counter(code_ptr beg,code_ptr end )
+{
+   cerr << "testing dr" << endl;
+   void * context = dr_standalone_init();
+   instr_t instr;
+   instr_init(context,&instr);
+   byte* pc = beg;
+   int count = 0;
+
+   while (pc < end) {
+      //byte* next = decode(context, pc, &instr);
+      //instr_reuse(context, &instr);
+      byte* next = decode_next_pc(context,pc);
+
+      /* check for invalid instr */
+      if (next == NULL) {
+	 pc ++;
+      } else {
+	 pc = next;
+      }
+      count ++;
+   } 
+
+   instr_free(context, &instr);
+   return count;
+}
+
 #endif
 
 

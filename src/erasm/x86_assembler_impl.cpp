@@ -16,6 +16,7 @@
    You should have received a copy of the GNU General Public License
    along with ERASM++; see the file COPYING.  If not see
    <http://www.gnu.org/licenses/>.  */
+#define ERASM_NO_META_ASSERT 1
 #include "erasm/x86_assembler_impl.hpp"
 #include <cstring>
 #include "common_macros.hpp"

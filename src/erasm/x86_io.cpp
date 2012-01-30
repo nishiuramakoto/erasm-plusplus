@@ -25,13 +25,6 @@
 namespace erasm {  namespace x86 {
 using namespace std;
 
-template<class X>
-inline const X& format(const X& x)
-{ return x; }
-
-inline int format(imm8_t x)
-{ return x; }
-
 
 struct PrintPtr
 {

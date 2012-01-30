@@ -28,7 +28,7 @@
 namespace erasm {  namespace x86 {
 
 ///////////////////////////////////////////////////////////////////////////
-//           Forward declarations                                        //
+//           Interface declarations                                      //
 ///////////////////////////////////////////////////////////////////////////
 
 inline std::ostream& operator<< (std::ostream& os,const VoidPtr& ptr);
@@ -54,6 +54,7 @@ inline std::ostream& operator<< (std::ostream& os,const ByteOffset32& offs);
 inline std::ostream& operator<< (std::ostream& os,const WordOffset32& offs);
 inline std::ostream& operator<< (std::ostream& os,const DwordOffset32& offs);
 inline std::ostream& operator<< (std::ostream& os,const QwordOffset32& offs);
+
 
 using x64::print_code;
 using x64::type_name;
@@ -109,7 +110,6 @@ inline std::ostream& operator<< (std::ostream& os,const Far32Ptr& ptr)
 { return impl::print(os,ptr) ; }
 
 
-
 namespace impl {
 template<class OffsetType,class ValType,bool no_segment>
 inline
@@ -146,6 +146,8 @@ inline std::ostream& operator<< (std::ostream& os,const DwordOffset32& offs)
 inline std::ostream& operator<< (std::ostream& os,const QwordOffset32& offs)
 { return impl::print(os,offs) ; }
 
+using x64::format;
+using x64::print_instruction;
 
 
 }}
