@@ -17,10 +17,17 @@
 #    along with ERASM++; see the file COPYING.  If not see
 #    <http://www.gnu.org/licenses/>.  
 
-SUBDIRS= . src
+SUBDIRS= . src 
 ACLOCAL_AMFLAGS= -I m4
 
+
+doc/manual.pdf :
+	cd doc && make
+
 dist_data_DATA = doc/manual.pdf \
+		 doc/manual.tex \
+		 doc/manual.lhs \
+		 doc/manual.bib \
 		 demo/demo86.cpp \
 		 demo/demo64.cpp \
 		 demo/dsm86_counter.cpp 

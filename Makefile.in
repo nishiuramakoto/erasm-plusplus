@@ -266,9 +266,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = . src
+SUBDIRS = . src 
 ACLOCAL_AMFLAGS = -I m4
 dist_data_DATA = doc/manual.pdf \
+		 doc/manual.tex \
+		 doc/manual.lhs \
+		 doc/manual.bib \
 		 demo/demo86.cpp \
 		 demo/demo64.cpp \
 		 demo/dsm86_counter.cpp 
@@ -773,6 +776,9 @@ uninstall-am: uninstall-dist_dataDATA
 	ps ps-am tags tags-recursive uninstall uninstall-am \
 	uninstall-dist_dataDATA
 
+
+doc/manual.pdf :
+	cd doc && make
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

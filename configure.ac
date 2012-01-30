@@ -70,7 +70,7 @@ fi
 AC_SUBST([AM_CXXFLAGS])
 
 
-AC_OUTPUT([Makefile src/Makefile])
+AC_OUTPUT([Makefile src/Makefile ])
 
 
                 
