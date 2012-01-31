@@ -10,9 +10,9 @@ int main(int argc,char**argv)
    using namespace erasm::x86::addr32;
    using namespace erasm::x86::addr32::data32;
 
-   byte_t buf[100];
-   byte_t *p = buf;
-   int32_t x = 2;
+   byte_t   buf[100];
+   code_ptr p = buf;
+   imm32_t  x = 2;
 
    p += mov(p,eax,dword_ptr[esp+4]);
    p += add(p,eax,x);
@@ -21,8 +21,8 @@ int main(int argc,char**argv)
    func_type f = (func_type)buf;   
    int len = p - buf;
 
-   cout << "result=" << f(argc) << endl
-	<< "code length=" << len << endl;
+   cout << "result="      << f(argc) << endl
+	<< "code length=" << len     << endl;
 
    return 0;
 }

@@ -16,7 +16,7 @@
 #    along with ERASM++; see the file COPYING.  If not see
 #    <http://www.gnu.org/licenses/>.  
 
-AC_INIT([ERASM],[0.1.1],[nishiuramakoto@gmail.com])
+AC_INIT([ERASM],[0.1.2],[nishiuramakoto@gmail.com])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])

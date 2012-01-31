@@ -1,6 +1,6 @@
 Copyright 2010,2011,2012 Makoto Nishiura.
 
-This is version 0.1.1 of Erasm++, a library for runtime code generation,
+This is version 0.1.2 of Erasm++, a library for runtime code generation,
 instruction decoding, and metaprogramming.
 
 See INSTALL for system requirements and installation instructions.
