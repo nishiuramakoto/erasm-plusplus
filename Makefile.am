@@ -37,7 +37,9 @@ dist_noinst_DATA =  \
 	doc/manual.lhs \
 	doc/manual.bib \
 	doc/Makefile \
-	doc/TexMakefile 
+	doc/TexMakefile \
+	demo/Makefile 
+
 
 
 		 demo/Makefile 
