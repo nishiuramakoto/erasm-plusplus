@@ -28,7 +28,9 @@ dist_data_DATA = doc/manual.pdf \
 		 doc/manual.tex \
 		 doc/manual.lhs \
 		 doc/manual.bib \
+		 demo/dsm86.cpp \
+		 demo/dsm64.cpp \
 		 demo/demo86.cpp \
 		 demo/demo64.cpp \
-		 demo/dsm86_counter.cpp 
-
+		 demo/dsm86_counter.cpp \
+		 demo/Makefile
