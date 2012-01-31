@@ -54,10 +54,11 @@ build_triplet = @build@
 host_triplet = @host@
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(dist_data_DATA) \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
-	TODO config/config.guess config/config.sub config/depcomp \
-	config/install-sh config/ltmain.sh config/missing
+	$(dist_noinst_DATA) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
+	ChangeLog INSTALL NEWS TODO config/config.guess \
+	config/config.sub config/depcomp config/install-sh \
+	config/ltmain.sh config/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -102,7 +103,7 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(datadir)"
-DATA = $(dist_data_DATA)
+DATA = $(dist_data_DATA) $(dist_noinst_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -269,15 +270,19 @@ top_srcdir = @top_srcdir@
 SUBDIRS = . src 
 ACLOCAL_AMFLAGS = -I m4
 dist_data_DATA = doc/manual.pdf \
-		 doc/manual.tex \
-		 doc/manual.lhs \
-		 doc/manual.bib \
 		 demo/dsm86.cpp \
 		 demo/dsm64.cpp \
 		 demo/demo86.cpp \
 		 demo/demo64.cpp \
-		 demo/dsm86_counter.cpp \
-		 demo/Makefile
+		 demo/dsm86_counter.cpp 
+
+dist_noinst_DATA = \
+	doc/manual.tex \
+	doc/manual.fmt \
+	doc/manual.lhs \
+	doc/manual.bib \
+	doc/Makefile \
+	doc/TexMakefile 
 
 all: all-recursive
 
@@ -782,6 +787,8 @@ uninstall-am: uninstall-dist_dataDATA
 
 doc/manual.pdf :
 	cd doc && make
+
+		 demo/Makefile 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
