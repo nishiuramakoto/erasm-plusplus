@@ -105,6 +105,7 @@ open. Maybe I will write a translator from the ghc Core? But then how can I
 ensure easy integration with the user defined types in C++? I'm not sure.
 
 Here is a list of important limitations:
+
 * It is an untyped calculus.
 
 * It doesn't support lambdas (efficiently).  You are expected to
