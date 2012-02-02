@@ -62,7 +62,7 @@ if test x"$debugit" = x"yes"; then
 else
     AC_DEFINE([NDEBUG],[],[No-debug Mode])
     AM_CPPFLAGS="$AM_CPPFLAGS -DNDEBUG"
-    AM_CXXFLAGS="$AM_CXXFLAGS -O3 -Wall"
+    AM_CXXFLAGS="$AM_CXXFLAGS -DNDEBUG -O3 -Wall"
 fi
 
 ##########################################################################

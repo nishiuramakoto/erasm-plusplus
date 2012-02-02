@@ -283,7 +283,8 @@ dist_noinst_DATA = \
 	doc/manual.bib \
 	doc/Makefile \
 	doc/TexMakefile \
-	demo/Makefile 
+	demo/Makefile \
+	README.md
 
 all: all-recursive
 
@@ -788,8 +789,6 @@ uninstall-am: uninstall-dist_dataDATA
 
 doc/manual.pdf :
 	cd doc && make
-
-		 demo/Makefile 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

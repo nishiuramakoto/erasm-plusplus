@@ -38,8 +38,5 @@ dist_noinst_DATA =  \
 	doc/manual.bib \
 	doc/Makefile \
 	doc/TexMakefile \
-	demo/Makefile 
-
-
-
-		 demo/Makefile 
+	demo/Makefile \
+	README.md
