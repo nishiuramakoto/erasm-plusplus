@@ -135,7 +135,7 @@ following files if you are interested:
 
 * src/erasm/meta_prelude.hpp
 * src/erasm/meta_leftist_heap.hpp
-* src/erasm/meta_polynomial
+* src/erasm/meta_polynomial.hpp
 * src/erasm/x86_addr16.hpp
 * src/erasm/x86_addr32.hpp
 * src/erasm/x64_addr64.hpp
