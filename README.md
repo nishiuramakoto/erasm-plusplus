@@ -8,15 +8,19 @@ Erasm++ is a collection of C++ libraries for high-performance runtime
 code generation, instruction decoding, and metaprogramming. It
 consists of the following three components:
 
-* ERASM++, a library for runtime code generation on x86/x64 architectures,
+* ERASM++, a library for runtime code generation on x86/x64
+  architectures,
+
 * GenericDsm, a fast generic instruction decoder library, and
-* MetaPrelude, a library for Haskell-like lazy (but untyped) metaprogramming.
+
+* MetaPrelude, a library for Haskell-like lazy (but untyped)
+  metaprogramming.
 
 Documentation
 -------------
 
-A preliminary [online manual](http://nishiuramakoto.github.com/erasm-plusplus/) 
-was constructed.  Alternatively,a PDF manual was also prepared. Please see
+A preliminary [online manual](http://nishiuramakoto.github.com/erasm-plusplus/) was
+constructed.  Alternatively, a PDF manual was also prepared. Please see
 doc/manual.pdf for an off-line documentation.
 
 Installation
@@ -31,7 +35,7 @@ Here I describe each component briefly.
 
 ### ERASM++ ###
 
-ERASM++,the Embedded Runtime Assembler in C++, is an Embedded Domain
+ERASM++, the Embedded Runtime Assembler in C++, is an Embedded Domain
 Specific Language (EDSL) in C++ for runtime code generation on Intel
 64/IA-32 architectures. The code looks like the following:
 
@@ -41,16 +45,16 @@ Specific Language (EDSL) in C++ for runtime code generation on Intel
 	// Unfortunately, lables are not yet implemented!
 	p += jmp  (p, 0x10);
 	
-Although similar runtime code generator libraries already exist, 
-I believe ERASM++ has the following strengths:
+Although similar runtime code generator libraries already exist, I
+believe ERASM++ has the following strengths:
 
 * It is easier to use because the syntax is more natural.
 
 * It is safer to use because the syntactically invalid expressions
   cause compilation errors, rather than runtime errors or exceptions.
 
-* It is faster because most of the encoding and the error
-  checking are done at compile-time, rather than at runtime.  
+* It is faster because most of the encoding and the error checking are
+  done at compile-time, rather than at runtime.
 
 It's so fast that the generator functions are actually compiled into a
 series of MOV instructions with no external references. Please see the
@@ -87,22 +91,25 @@ The following code illustrates the idea:
 		  cout << Jmp::mnemonic << " " << op << endl;
 		  return finish(insn);
         }
-   };
+	};
 
 
 Just as ERASM++, The main strength of GenericDsm is its performance.
-Please see the documentation for the details.
+Please see the documentation for the detail.
 
 
 ### MetaPrelude ###
 
-MetaPrelude is a library for (untyped) lazy metaprogramming which tries
-to mimic Haskell as much as possible. It is used as the backend of static
-type-level computation in ERASM++ and GenericDsm.
+MetaPrelude is a library for (untyped) lazy metaprogramming in C++
+which tries to mimic Haskell as much as possible. It is used as the
+backend of static type-level computation in ERASM++ and GenericDsm.  I
+hope it should help implementing more complex EDSLs than the assembly
+language.
 
-It is still far from complete, and the important design decisions are still 
-open. Maybe I will write a translator from the ghc Core? But then how can I
-ensure easy integration with the user defined types in C++? I'm not sure.
+It is still far from complete, and the important design decisions are
+still open. Maybe I will write a translator from the ghc Core? But
+then how can I ensure easy integration with the user defined types in
+C++? I'm not sure.
 
 Here is a list of important limitations:
 
@@ -120,10 +127,11 @@ Here is a list of important limitations:
   
 * Most importantly, the complexity of the program is dependent upon
   the particular compiler implementation! Some compilers cache
-  template instantiations, some do not,some in-between, and all this
+  template instantiations, some do not, some in-between, and all this
   can make a difference of linear to super-exponential complexity.
 
-For now, please look at the following files for the examples:
+For the moment, code is the only documentation. Please see the
+following files if you are interested:
 
 * src/erasm/meta_prelude.hpp
 * src/erasm/meta_leftist_heap.hpp
