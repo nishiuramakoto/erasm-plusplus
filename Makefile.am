@@ -39,4 +39,5 @@ dist_noinst_DATA =  \
 	doc/Makefile \
 	doc/TexMakefile \
 	demo/Makefile \
-	README.md
+	README.md \
+	LICENSE_1_0.txt

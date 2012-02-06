@@ -91,13 +91,12 @@ public:
 
    int get_counter() const
       { return counter_ ; }
-
    
    template<class Insn>
    action_result_type
    action(const Insn& insn)
       {
-	 counter_ ++;
+	 inc_counter();
 	 return next(insn);
       }
 
@@ -106,7 +105,7 @@ public:
    action(const Insn& insn,
 	  const Op1& op1)
       {
-	 counter_ ++;
+	 inc_counter();
 	 return next(insn);
       }
 
@@ -116,7 +115,7 @@ public:
 	  const Op1& op1,
 	  const Op2& op2)
       {
-	 counter_ ++;
+	 inc_counter();
 	 return next(insn);
       }
 
@@ -127,11 +126,14 @@ public:
 	  const Op2& op2,
 	  const Op3& op3)
       {
-	 counter_ ++;
+	 inc_counter();
 	 return next(insn);
       }
    
 protected:
+   void inc_counter() 
+      { counter_ ++ ; }
+
    int counter_;
 };
 

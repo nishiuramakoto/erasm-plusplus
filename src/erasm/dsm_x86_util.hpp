@@ -7,6 +7,8 @@
 
 namespace erasm { namespace x86 {
 
+using x64::DsmBase;
+using x64::InstructionCounter;
 using x64::SimpleDsm;
 
 }}

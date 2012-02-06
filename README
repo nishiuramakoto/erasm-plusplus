@@ -103,7 +103,7 @@ Please see the documentation for the detail.
 MetaPrelude is a library for (untyped) lazy metaprogramming in C++
 which tries to mimic Haskell as much as possible. It is used as the
 backend of static type-level computation in ERASM++ and GenericDsm.  I
-hope it should help implementing more complex EDSLs than the assembly
+hope it could help implementing more complex EDSLs than the assembly
 language.
 
 It is still far from complete, and the important design decisions are
@@ -115,9 +115,8 @@ Here is a list of important limitations:
 
 * It is an untyped calculus.
 
-* It doesn't support lambdas (efficiently).  You are expected to
-  lambda-lift every unnamed function.  This means that you can't have
-  Haskell-style monads syntactically.  You still have monads in
+* It doesn't support lambdas (efficiently). This means that you can't
+  have Haskell-style monads syntactically.  You still have monads in
   mathematical sense, of course, as monads are just an abstraction of
   *actions* of monoids.
 
@@ -127,8 +126,9 @@ Here is a list of important limitations:
   
 * Most importantly, the complexity of the program is dependent upon
   the particular compiler implementation! Some compilers cache
-  template instantiations, some do not, some in-between, and all this
-  can make a difference of linear to super-exponential complexity.
+  template instantiations, some do not, some in-between at various
+  degrees, and all this can make a difference of linear to
+  super-exponential complexity.
 
 For the moment, code is the only documentation. Please see the
 following files if you are interested:
